@@ -5,8 +5,10 @@ const userModel = require("../model/userModel");
 const ErrorHandler = require("../utils/errorhadler");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
+const jwt=require("jsonwebtoken")
 const crypto = require("crypto");
 const { sendMail } = require("../utils/mail");
+const catchAsyncError = require("../middleware/catchAsyncError");
 
 const userRouter = express.Router();
        
@@ -19,7 +21,7 @@ userRouter.get("/signup", async (req, res) => {
     res.status(200).send("Signup Page");
 });
 
-userRouter.post("/signup", async (req, res, next) => {
+userRouter.post("/signup",catchAsyncError( async (req, res, next) => {
     try {
         const { name, email, password } = req.body;
 
@@ -45,7 +47,7 @@ userRouter.post("/signup", async (req, res, next) => {
         console.error(error);
         res.status(500).json({ message: "Server error", error });
     }
-});
+}));
 
 async function sendOTP(email, otp) {
     try {
@@ -69,7 +71,7 @@ async function sendOTP(email, otp) {
     }
 }
 
-userRouter.post("/verify-otp", async (req, res, next) => {
+userRouter.post("/verify-otp",catchAsyncError( async (req, res, next) => {
     try {
         const { email, otp } = req.body;
 
@@ -105,8 +107,48 @@ userRouter.post("/verify-otp", async (req, res, next) => {
         res.status(200).json({ success: true, message: "Signup successful" });
     } catch (error) {
         console.error(error);
-        next(new ErrorHandler("Server Error", 500));
+       return next(new ErrorHandler("Server Error", 500));
     }
-});
+}));
+
+userRoute.post("/login",catchAsyncError(async (req, res, next) => {
+    const { email, password } = req.body;
+    console.log(email)
+    if (!email || !password) {
+     return next(new Errorhadler("email and password are reqires", 400));
+    }
+
+    let user = await UserModel.findOne({ email });
+    console.log(user,"9999999999999")
+
+    if (!user) {
+      return next(new Errorhadler("Please Signup", 400));
+    }
+
+    if(!user.isActivated){
+      return next(new Errorhadler("Please Signup", 400));
+    }
+
+    await bcrypt.compare(password, user.password, function(err, result) {
+      if(err){
+        return next(new Errorhadler("internal server error", 500));
+      }
+      if(!result){
+        return next(new Errorhadler("password is incorrect", 400));
+      }
+      let token = jwt.sign({ id: user._id }, process.env.SECRET, {
+        expiresIn: 60 * 60 * 60 * 24 * 30,
+      });
+      res.cookie("accesstoken", token, {
+        httpOnly: true,
+        MaxAge: "5d",
+      });
+      res.status(200).json({status:true,message:"login successful"})
+
+      
+    });
+  }));
+
+
 
 module.exports = userRouter;
