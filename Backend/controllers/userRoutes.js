@@ -90,6 +90,10 @@ userRouter.post("/verify-otp",catchAsyncError( async (req, res, next) => {
             return next(new ErrorHandler("All fields are required", 400));
         }
 
+
+
+        
+
         const storedData = otpStore.get(email);
         if (!storedData) {
             return next(new ErrorHandler("OTP expired or not requested", 400));
