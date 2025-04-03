@@ -9,6 +9,7 @@ const jwt=require("jsonwebtoken")
 const crypto = require("crypto");
 const { sendMail } = require("../utils/mail");
 const catchAsyncError = require("../middleware/catchAsyncError");
+const { rejects } = require("assert");
 
 const userRouter = express.Router();
        
@@ -27,6 +28,16 @@ userRouter.post("/signup",catchAsyncError( async (req, res, next) => {
 
         if (!email || !name || !password) {
             return next(new ErrorHandler("All fields are required", 400));
+        }
+        if (email) {
+            if(!email.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)){
+                return next(new ErrorHandler("Invalid email format", 400));
+            }
+        }
+        if (password) {
+            if (!password.match(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/)) {
+                return next(new ErrorHandler("Password must be at least 8 characters long and contain at least one letter and one number", 400));
+            }
         }
 
         let user = await userModel.findOne({ email});
@@ -111,22 +122,26 @@ userRouter.post("/verify-otp",catchAsyncError( async (req, res, next) => {
     }
 }));
 
-userRoute.post("/login",catchAsyncError(async (req, res, next) => {
+userRouter.post("/login",catchAsyncError(async (req, res, next) => {
     const { email, password } = req.body;
     console.log(email)
-    if (!email || !password) {
-     return next(new Errorhadler("email and password are reqires", 400));
+    if(!email){
+        return next(new ErrorHandler("Email is required", 400));
     }
+    if(!password){
+        return next(new ErrorHandler("Password is required", 400));
+    }
+    
 
     let user = await UserModel.findOne({ email });
     console.log(user,"9999999999999")
 
     if (!user) {
-      return next(new Errorhadler("Please Signup", 400));
+      return next(new ErrorHandler("Please Signup", 400));
     }
 
     if(!user.isActivated){
-      return next(new Errorhadler("Please Signup", 400));
+      return next(new ErrorHandler("Please Signup", 400));
     }
 
     await bcrypt.compare(password, user.password, function(err, result) {
@@ -150,5 +165,12 @@ userRoute.post("/login",catchAsyncError(async (req, res, next) => {
   }));
 
 
+  userRouter.post("/logout",catchAsyncError(req,res,next)=>{
+    res.cleartoken()
+  })
+
+
 
 module.exports = userRouter;
+
+
