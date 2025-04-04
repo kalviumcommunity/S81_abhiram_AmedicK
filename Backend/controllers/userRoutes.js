@@ -19,7 +19,9 @@ require("dotenv").config();
 
 
 userRouter.get("/signup", async (req, res) => {
-    res.status(200).send("Signup Page");
+    res.status(200).send("Signup Page");    
+
+    
 });
 
 userRouter.post("/signup",catchAsyncError( async (req, res, next) => {
