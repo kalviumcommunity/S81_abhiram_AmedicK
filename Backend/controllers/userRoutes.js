@@ -171,9 +171,6 @@ userRouter.post("/login",catchAsyncError(async (req, res, next) => {
   }));
 
 
-
-
-
 module.exports = userRouter;
 
 
