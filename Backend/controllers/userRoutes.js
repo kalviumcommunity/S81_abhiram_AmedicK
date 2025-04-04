@@ -169,11 +169,6 @@ userRouter.post("/login",catchAsyncError(async (req, res, next) => {
   }));
 
 
-  userRouter.post("/logout",catchAsyncError(req,res,next)=>{
-    res.cleartoken()
-  })
-
-
 
 module.exports = userRouter;
 
