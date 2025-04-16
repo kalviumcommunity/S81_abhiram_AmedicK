@@ -16,7 +16,7 @@ const userSchema = mongoose.Schema({
     required: true,
   },
   phone: {
-    type: String,
+    type: String
   },
   doctorDetails: {
     type: mongoose.Schema.Types.ObjectId,

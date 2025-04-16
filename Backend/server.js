@@ -7,8 +7,7 @@ const userRoutes=require('./controllers/userRoutes')
 
 app.get("/test",async(req,res)=>{
     console.log("It is running")
-      
-
+    
 })
 
 
