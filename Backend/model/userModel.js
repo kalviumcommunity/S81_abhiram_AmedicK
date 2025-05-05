@@ -26,6 +26,10 @@ const userSchema = mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  isActivated:{
+    type:Boolean,
+    default:false
+  }
 });
 
 const UserModel = mongoose.model("User", userSchema);

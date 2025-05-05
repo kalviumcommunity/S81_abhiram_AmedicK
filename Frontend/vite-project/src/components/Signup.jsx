@@ -42,10 +42,13 @@ function Signup() {
         name,
         email,
         password,
+      },{
+        withCredentials:true
       });
+      
 
       console.log("Successfully registered:", response.data);
-      navigate("/otp"); // Navigating to OTP page for verification
+      navigate("/otpVerify",{state:{email}}); // Navigating to OTP page for verification
     } catch (error) {
       console.log(error);
       setErr(error.response?.data?.message || "Signup failed");
@@ -90,7 +93,7 @@ function Signup() {
           transition={{ duration: 0.5 }}
           className="text-3xl font-extrabold text-center text-teal-700 mb-6"
         >
-          Create Your Account 
+          Create Your Account
         </motion.h1>
 
         {err && (

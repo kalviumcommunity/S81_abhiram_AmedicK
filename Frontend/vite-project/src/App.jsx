@@ -2,8 +2,8 @@ import React from 'react'
 import Loginpage from './components/Loginpage'
 import Signup from './components/Signup'
 import Home from './components/Home'
-import OTPSignupPage from './components/OTPSignupPage'
 import { BrowserRouter,Routes,Route } from 'react-router-dom'
+import OtpVerifyPage from './components/otp'
 
 
 const App = () => {
@@ -15,7 +15,8 @@ const App = () => {
             <Route  path="/"  element={<Home/>}/>
             <Route path="/login" element={<Loginpage/>}/>
             <Route path='/signup' element={<Signup/>}/>
-            <Route path="/signup/otp" element={<OTPSignupPage />} />
+            <Route path='/otpVerify' element={<OtpVerifyPage />} />
+
        </Routes>
      </BrowserRouter>
     </>

@@ -10,7 +10,7 @@ function Loginpage() {
   const [error, setError] = useState("");
   const [data, setData] = useState({ email: "", password: "" });
 
-  const handleHide = () => setHide(!hide);
+  const handleHide = () => setHide((prev) => !prev);
 
   const handleForm = (e) => {
     setError("");
@@ -20,7 +20,7 @@ function Loginpage() {
   const handleSubmit = async () => {
     const { email, password } = data;
     if (!email || !password) {
-      setError("Please fill all fields");
+      setError("Please fill in all fields.");
       return;
     }
 
@@ -30,17 +30,28 @@ function Loginpage() {
         { email, password },
         { withCredentials: true }
       );
-      console.log(response.data);
+      if(response.data.token){
+        localStorage.setItem("token",response.data.token)
+      }
+
+      console.log("Login successful:", response.data);
       navigate("/");
-    } catch (error) {
-      console.error("Login error:", error);
-      setError(error.response?.data?.message || "Login failed");
+    } catch (err) {
+      const message =
+        err.response?.data?.message ||
+        err.message ||
+        "Something went wrong. Please try again.";
+      setError(message);
     }
   };
 
   const pageVariants = {
     initial: { opacity: 0, scale: 0.9 },
-    animate: { opacity: 1, scale: 1, transition: { duration: 0.6, ease: "easeOut" } },
+    animate: {
+      opacity: 1,
+      scale: 1,
+      transition: { duration: 0.6, ease: "easeOut" },
+    },
     exit: { opacity: 0, scale: 0.7, transition: { duration: 0.3 } },
   };
 
@@ -93,10 +104,10 @@ function Loginpage() {
         <motion.label
           htmlFor="email"
           className="block text-gray-700 font-semibold mb-2"
-          custom={0}
           variants={inputVariants}
           initial="hidden"
           animate="visible"
+          custom={0}
         >
           Email Address
         </motion.label>
@@ -107,28 +118,28 @@ function Loginpage() {
           value={data.email}
           onChange={handleForm}
           className="w-full p-3 border border-teal-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-teal-500 bg-blue-50"
-          custom={0.1}
           variants={inputVariants}
           initial="hidden"
           animate="visible"
+          custom={0.1}
         />
 
         <motion.label
           htmlFor="password"
           className="block text-gray-700 font-semibold mb-2"
-          custom={1}
           variants={inputVariants}
           initial="hidden"
           animate="visible"
+          custom={0.2}
         >
           Password
         </motion.label>
         <motion.div
           className="relative"
-          custom={1.2}
           variants={inputVariants}
           initial="hidden"
           animate="visible"
+          custom={0.3}
         >
           <input
             id="password"
@@ -142,6 +153,7 @@ function Loginpage() {
             type="button"
             onClick={handleHide}
             whileTap={{ scale: 1.2, rotate: 15 }}
+            aria-label="Toggle password visibility"
             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-teal-600 hover:text-teal-800"
           >
             {hide ? <FaRegEye size={20} /> : <FaRegEyeSlash size={20} />}
