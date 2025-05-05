@@ -1,24 +1,24 @@
-const mongoose = require("mongoose");
+    const mongoose = require("mongoose");
 
-const docterSchema = mongoose.Schema({
-  name: {
-    type: String,
-    require: true,
-  },
-  email: {
-    type: String,
-    require: true,
-  },
-  password: {
-    type: String,
-    require: true,
-  },
-  onDuty: {
-    type: Boolean,
-    default: false,
-  },
-});
+    const docterSchema = mongoose.Schema({
+    name: {
+        type: String,
+        require: true,
+    },
+    email: {
+        type: String,
+        require: true,
+    },
+    password: {
+        type: String,
+        require: true,
+    },
+    onDuty: {
+        type: Boolean,
+        default: false,
+    },
+    });
 
-const DocterModel = mongoose.model("docter", docterSchema);
+    const DocterModel = mongoose.model("docter", docterSchema);
 
-module.exports = DocterModel;
+    module.exports = DocterModel;
