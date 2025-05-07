@@ -38,6 +38,7 @@ function Signup() {
     }
 
     try {
+      // console.log(password)
       const response = await axios.post("http://localhost:9090/user/signup", {
         name,
         email,
