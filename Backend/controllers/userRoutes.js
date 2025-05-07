@@ -147,6 +147,18 @@ userRouter.post(
   })
 );
 
+//Get Routes added on may 7
+userRouter.get(
+  "/users",
+  catchAsyncError(async (req, res, next) => {
+    const users = await userModel.find({}, "-password"); // Exclude password field
+    res.status(200).json({
+      success: true,
+      users,
+    });
+  })
+);
+
 // Helper: Send OTP Email
 async function sendOTP(email, otp) {
   const transporter = nodemailer.createTransport({
