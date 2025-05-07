@@ -2,7 +2,7 @@
 
 
 ## 1. Introduction
-    AmedicK is a healthcare appointment booking system that enables patients to book appointments with doctors online. The app provides a convenient interface for both patients and doctors. For premium users, the app offers the added benefit of video consultations, enhancing the healthcare experience by eliminating the need for in-person visits, particularly for follow-ups and routine consultations.
+    AmedicK is a healthcare appointment booking system that enables patients to book appointments with doctors online. The app provides a convenient interface for both patients and doctors. For premium users, the app offers the added benefit of video consultations, enhancing the healthcare experience by eliminating the need for in-person visits, particularly for follow-ups and routine consultations..
 
 ## 2. Problem Statement
     Healthcare systems often face challenges when it comes to ensuring access to medical care. Many patients face geographical, physical, or time-related barriers that prevent them from visiting doctors regularly.
