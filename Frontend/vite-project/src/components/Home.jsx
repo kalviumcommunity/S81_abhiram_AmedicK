@@ -56,7 +56,9 @@ const Home = () => {
         >
           <FaCalendarCheck className="text-4xl mx-auto mb-4 text-teal-600" />
           <h2 className="font-semibold text-lg">Quick Appointments</h2>
-          <p className="text-gray-600 text-sm mt-2">Book instantly, no queues.</p>
+          <p className="text-gray-600 text-sm mt-2">
+            Book instantly, no queues.
+          </p>
         </motion.div>
 
         <motion.div
@@ -65,7 +67,9 @@ const Home = () => {
         >
           <FaUserMd className="text-4xl mx-auto mb-4 text-teal-600" />
           <h2 className="font-semibold text-lg">Expert Doctors</h2>
-          <p className="text-gray-600 text-sm mt-2">Certified and experienced.</p>
+          <p className="text-gray-600 text-sm mt-2">
+            Certified and experienced.
+          </p>
         </motion.div>
 
         <motion.div
@@ -74,7 +78,9 @@ const Home = () => {
         >
           <FaHospitalUser className="text-4xl mx-auto mb-4 text-teal-600" />
           <h2 className="font-semibold text-lg">24/7 Help</h2>
-          <p className="text-gray-600 text-sm mt-2">Always available for you.</p>
+          <p className="text-gray-600 text-sm mt-2">
+            Always available for you.
+          </p>
         </motion.div>
       </div>
 

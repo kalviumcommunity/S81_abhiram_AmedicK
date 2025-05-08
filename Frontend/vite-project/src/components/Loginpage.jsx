@@ -30,8 +30,8 @@ function Loginpage() {
         { email, password },
         { withCredentials: true }
       );
-      if(response.data.token){
-        localStorage.setItem("token",response.data.token)
+      if (response.data.token) {
+        localStorage.setItem("token", response.data.token);
       }
 
       console.log("Login successful:", response.data);
