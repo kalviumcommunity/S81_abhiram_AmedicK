@@ -4,6 +4,7 @@ const userRouter=require('./controllers/userRoutes')
 const app=express()
 const cors=require("cors")
 app.use(express.json())
+require('./config/passport')
 
 app.use(cors({
     origin: "http://localhost:5173",

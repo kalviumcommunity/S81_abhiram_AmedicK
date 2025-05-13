@@ -2,6 +2,7 @@ import React from "react";
 import Loginpage from "./components/Loginpage";
 import Signup from "./components/Signup";
 import Home from "./components/Home";
+import GoogleSuccess from "./components/GoogleSuccess";
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import OtpVerifyPage from "./components/otp";
@@ -16,6 +17,7 @@ const App = () => {
           <Route path="/login" element={<Loginpage />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/otpVerify" element={<OtpVerifyPage />} />
+          <Route path="/google-success" element={<GoogleSuccess />}></Route>
         </Routes>
       </BrowserRouter>
     </>

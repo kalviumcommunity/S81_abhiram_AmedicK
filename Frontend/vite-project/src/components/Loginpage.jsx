@@ -3,6 +3,7 @@ import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import GoogleButton from "./GoogleButton";
 
 function Loginpage() {
   const navigate = useNavigate();
@@ -147,6 +148,7 @@ function Loginpage() {
             type={hide ? "password" : "text"}
             value={data.password}
             onChange={handleForm}
+            required
             className="w-full p-3 border border-teal-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-teal-500 bg-blue-50"
           />
           <motion.button
@@ -184,7 +186,9 @@ function Loginpage() {
             >
               Sign up
             </span>
+            <GoogleButton/>
           </p>
+          
         </motion.div>
       </div>
     </motion.div>

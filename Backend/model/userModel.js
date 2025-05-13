@@ -13,7 +13,7 @@
       },
       password: {
         type: String,
-        required: true,
+        required: false,
       },
       phone: {
         type: String,
@@ -32,5 +32,5 @@
       },
     });
 
-    const UserModel = mongoose.model("User", userSchema);
-    module.exports = UserModel;
+    const userModel = mongoose.model("User", userSchema);
+    module.exports = {userModel};
