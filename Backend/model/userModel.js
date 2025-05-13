@@ -1,5 +1,5 @@
     const mongoose = require("mongoose");
-    const DocterModel = require("../model/docterModel");
+      const DocterModel = require("../model/docterModel");
 
     const userSchema = mongoose.Schema({
       name: {
@@ -18,10 +18,10 @@
       phone: {
         type: String,
       },
-      doctorDetails: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Doctor",
-      },
+        doctorDetails: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Doctor",
+        },
       dateJoined: {
         type: Date,
         default: Date.now,
