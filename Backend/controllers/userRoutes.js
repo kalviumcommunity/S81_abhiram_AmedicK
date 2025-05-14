@@ -10,6 +10,11 @@ const crypto = require("crypto");
 const { sendMail } = require("../utils/mail");
 const catchAsyncError = require("../middleware/catchAsyncError");
 const passport = require('passport');
+const {Profile}=require("../model/profileModel")
+const path = require("path");
+const {upload}=require("../middleware/multer");
+const {auth}= require('../middleware/auth')
+
 
 const userRouter = express.Router();
 const otpStore = new Map();
@@ -108,6 +113,31 @@ userRouter.post(
     res.status(200).json({ success: true, message: "Signup successful" });
   })
 );
+
+//Profile
+ userRouter.post("/upload",auth,upload.single("photo"), catchAsyncError(async (req, res, next) => {
+
+    if (!req.file) {
+      return next(new ErrorHandler("File not found", 400))
+    }
+
+    // console.log("3534434343434343434")
+    const userId = req.user_id
+    // console.log(userId,"3534434343434343434")
+    if (!userId) {
+      return next(new ErrorHandler("userId not found", 400))
+    }
+
+    
+    const fileName = path.basename(req.file.path)
+    let updated = await Profile.findByIdAndUpdate(userId, { profilePhoto: fileName }, { new: true })
+    res.status(200).json({ message: updated })
+
+  }))
+
+
+
+
 
 // POST: Login
 userRouter.post(
