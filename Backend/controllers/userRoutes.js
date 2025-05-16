@@ -228,7 +228,7 @@ async function sendOTP(email, otp) {
 
 
     
-      const token = jwt.sign({ id: existingUser._id, role: existingUser.role }, process.env.SECRET, { expiresIn: "24h" });
+    const token = jwt.sign({ id: existingUser._id, role: existingUser.role }, process.env.SECRET, { expiresIn: "24h" });
 
       res.cookie("accesstoken", token, {
         httpOnly: true,
