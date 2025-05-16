@@ -26,114 +26,114 @@ userRouter.get("/signup", (req, res) => {
 });
 
 // POST: Signup
-userRouter.post(
-  "/signup",
-  catchAsyncError(async (req, res, next) => {
-    const { name, email, password } = req.body;
-    console.log(password)
+  userRouter.post(
+    "/signup",
+    catchAsyncError(async (req, res, next) => {
+      const { name, email, password } = req.body;
+      console.log(password)
 
-    if (!email || !name || !password) {
-      return next(new ErrorHandler("All fields are required", 400));
-    }
+      if (!email || !name || !password) {
+        return next(new ErrorHandler("All fields are required", 400));
+      }
 
-    if (!email.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)) {
-      return next(new ErrorHandler("Invalid email format", 400));
-    }
+      if (!email.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)) {
+        return next(new ErrorHandler("Invalid email format", 400));
+      }
 
-    if (!password.match(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/)) {
-      return next(
-        new ErrorHandler(
-          "Password must be at least 8 characters long and contain at least one letter and one number",
-          400
-        )
-      );
-    }
+      if (!password.match(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/)) {
+        return next(
+          new ErrorHandler(
+            "Password must be at least 8 characters long and contain at least one letter and one number",
+            400
+          )
+        );
+      }
 
-    const existingUser = await userModel.findOne({ email });
-    if (existingUser) {
-      return next(new ErrorHandler("User already exists", 400));
-    }
+      const existingUser = await userModel.findOne({ email });
+      if (existingUser) {
+        return next(new ErrorHandler("User already exists", 400));
+      }
 
-    const otp = crypto.randomInt(100000, 999999).toString();
-    const hashedPassword = await bcrypt.hash(password, 10);
+      const otp = crypto.randomInt(100000, 999999).toString();
+      const hashedPassword = await bcrypt.hash(password, 10);
 
-    otpStore.set(email, {
-      otp,
-      name,
-      hashedPassword,
-      expiresAt: Date.now() + 5 * 60 * 1000, // 5 minutes
-    });
+      otpStore.set(email, {
+        otp,
+        name,
+        hashedPassword,
+        expiresAt: Date.now() + 5 * 60 * 1000, // 5 minutes
+      });
 
-    try {
-      await sendOTP(email, otp);
-    } catch (error) {
+      try {
+        await sendOTP(email, otp);
+      } catch (error) {
+        otpStore.delete(email);
+        return next(new ErrorHandler("Failed to send OTP", 500));
+      }
+
+      res.status(200).json({ success: true, message: "OTP sent to your email" });
+    })
+  );
+
+  // POST: Verify OTP
+  userRouter.post(
+    "/verify-otp",
+    catchAsyncError(async (req, res, next) => {
+      const { otp, email } = req.body;
+
+      if (!otp || !email) {
+        return next(new ErrorHandler("Email and OTP are required", 400));
+      }
+
+      const storedData = otpStore.get(email);
+
+      if (!storedData) {
+        return next(new ErrorHandler("OTP expired or not requested", 400));
+      }
+
+      if (Date.now() > storedData.expiresAt) {
+        otpStore.delete(email);
+        return next(new ErrorHandler("OTP has expired", 400));
+      }
+
+      if (storedData.otp !== otp) {
+        return next(new ErrorHandler("Invalid OTP", 400));
+      }
+
+      const user = new userModel({
+        name: storedData.name,
+        email,
+        password: storedData.hashedPassword,
+        isActivated: true,
+      });
+
+      await user.save();
       otpStore.delete(email);
-      return next(new ErrorHandler("Failed to send OTP", 500));
-    }
 
-    res.status(200).json({ success: true, message: "OTP sent to your email" });
-  })
-);
+      res.status(200).json({ success: true, message: "Signup successful" });
+    })
+  );
 
-// POST: Verify OTP
-userRouter.post(
-  "/verify-otp",
-  catchAsyncError(async (req, res, next) => {
-    const { otp, email } = req.body;
+  //Profile
+  userRouter.post("/upload",auth,upload.single("photo"), catchAsyncError(async (req, res, next) => {
 
-    if (!otp || !email) {
-      return next(new ErrorHandler("Email and OTP are required", 400));
-    }
+      if (!req.file) {
+        return next(new ErrorHandler("File not found", 400))
+      }
 
-    const storedData = otpStore.get(email);
+      // console.log("3534434343434343434")
+      const userId = req.user_id
+      // console.log(userId,"3534434343434343434")
+      if (!userId) {
+        return next(new ErrorHandler("userId not found", 400))
+      }
 
-    if (!storedData) {
-      return next(new ErrorHandler("OTP expired or not requested", 400));
-    }
+      
+      const fileName = path.basename(req.file.path)
+      let updated = await Profile.findByIdAndUpdate(userId, { profilePhoto: fileName }, { new: true })
+      res.status(200).json({ message: updated })
 
-    if (Date.now() > storedData.expiresAt) {
-      otpStore.delete(email);
-      return next(new ErrorHandler("OTP has expired", 400));
-    }
-
-    if (storedData.otp !== otp) {
-      return next(new ErrorHandler("Invalid OTP", 400));
-    }
-
-    const user = new userModel({
-      name: storedData.name,
-      email,
-      password: storedData.hashedPassword,
-      isActivated: true,
-    });
-
-    await user.save();
-    otpStore.delete(email);
-
-    res.status(200).json({ success: true, message: "Signup successful" });
-  })
-);
-
-//Profile
- userRouter.post("/upload",auth,upload.single("photo"), catchAsyncError(async (req, res, next) => {
-
-    if (!req.file) {
-      return next(new ErrorHandler("File not found", 400))
-    }
-
-    // console.log("3534434343434343434")
-    const userId = req.user_id
-    // console.log(userId,"3534434343434343434")
-    if (!userId) {
-      return next(new ErrorHandler("userId not found", 400))
-    }
-
-    
-    const fileName = path.basename(req.file.path)
-    let updated = await Profile.findByIdAndUpdate(userId, { profilePhoto: fileName }, { new: true })
-    res.status(200).json({ message: updated })
-
-  }))
+    }))
 
 
 
