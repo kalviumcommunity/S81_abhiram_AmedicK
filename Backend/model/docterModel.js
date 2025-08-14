@@ -19,6 +19,6 @@
         },
         });
 
-        const DocterModel = mongoose.model("docter", docterSchema);
+        const DocterModel = mongoose.model("Doctor", docterSchema);
 
         module.exports = DocterModel;

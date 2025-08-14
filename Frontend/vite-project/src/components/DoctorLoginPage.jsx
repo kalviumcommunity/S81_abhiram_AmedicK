@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import GoogleButton from "./GoogleButton";
 
-function Loginpage() {
+function DoctorLoginPage() {
   const navigate = useNavigate();
   const [hide, setHide] = useState(true);
   const [error, setError] = useState("");
@@ -27,15 +27,16 @@ function Loginpage() {
 
     try {
       const response = await axios.post(
-        "http://localhost:9090/user/login",
+        "http://localhost:9090/docter/login", // doctor-specific login endpoint
         { email, password },
         { withCredentials: true }
       );
+
       if (response.data.token) {
-        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("doctorToken", response.data.token);
       }
 
-      console.log("Login successful:", response.data);
+      console.log("Doctor login successful:", response.data);
       navigate("/");
     } catch (err) {
       const message =
@@ -88,7 +89,7 @@ function Loginpage() {
           transition={{ duration: 0.5 }}
           className="text-3xl font-extrabold text-center text-teal-700 mb-6"
         >
-          Welcome Back 👋
+          Doctor Login 🩺
         </motion.h1>
 
         {error && (
@@ -169,7 +170,7 @@ function Loginpage() {
           whileTap={{ scale: 0.95 }}
           className="w-full p-3 bg-teal-600 text-white font-semibold rounded-lg mb-4 hover:bg-teal-700 transition shadow-md"
         >
-          Login
+          Login as Doctor
         </motion.button>
 
         <motion.div
@@ -179,20 +180,19 @@ function Loginpage() {
           className="text-center"
         >
           <div className="text-gray-700">
-            Don’t have an account?{" "}
+            Not registered yet?{" "}
             <span
-              onClick={() => navigate("/signup")}
+              onClick={() => navigate("/doctor/signup")}
               className="text-teal-600 cursor-pointer hover:underline font-semibold"
             >
               Sign up
             </span>
-            <GoogleButton/>
+            <GoogleButton />
           </div>
-          
         </motion.div>
       </div>
     </motion.div>
   );
 }
 
-export default Loginpage;
+export default DoctorLoginPage;

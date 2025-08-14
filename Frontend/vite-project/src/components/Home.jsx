@@ -10,17 +10,62 @@ import {
   FaSignOutAlt,
   FaAddressCard,
 } from "react-icons/fa";
+import axios from "axios";
 
 const Home = () => {
   const navigate = useNavigate();
   const [showAppointments, setShowAppointments] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const token = localStorage.getItem("token");
 
-  const toggleAppointments = () => {
-    setShowAppointments(!showAppointments);
+  const decodeJWT = (token) => {
+    try {
+      const base64Url = token.split(".")[1];
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split("")
+          .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+          .join("")
+      );
+      return JSON.parse(jsonPayload);
+    } catch (err) {
+      console.error("Invalid token", err);
+      return null;
+    }
+  };
+
+  const toggleAppointments = async () => {
+    const shouldShow = !showAppointments;
+    setShowAppointments(shouldShow);
     setProfileMenuOpen(false);
+
+    if (!shouldShow) return;
+
+    const decoded = decodeJWT(token);
+    const patientId = decoded?.id || decoded?._id;
+
+    if (!patientId) return;
+
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        `http://localhost:9090/appointmentsbook/patient/${patientId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setAppointments(response.data);
+    } catch (error) {
+      console.error("Failed to fetch appointments", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const logout = () => {
@@ -64,7 +109,6 @@ const Home = () => {
               <FaUserCircle className="text-4xl text-teal-700 hover:text-teal-800 transition" />
             </button>
 
-            {/* Dropdown menu */}
             {profileMenuOpen && (
               <motion.div
                 className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-lg border border-teal-100 py-2"
@@ -96,7 +140,7 @@ const Home = () => {
         )}
       </div>
 
-      {/* Main Content */}
+      {/* Main Heading */}
       <motion.h1
         className="text-5xl font-extrabold text-teal-800 text-center mb-6"
         initial={{ y: -40, opacity: 0 }}
@@ -118,14 +162,13 @@ const Home = () => {
       {/* Feature Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-6xl mx-auto mb-12">
         <motion.div
-          className="bg-white p-6 rounded-2xl shadow-xl text-center"
+          className="bg-white p-6 rounded-2xl shadow-xl text-center cursor-pointer"
           whileHover={{ scale: 1.05 }}
+          onClick={() => navigate("/quick-appointment")}
         >
           <FaCalendarCheck className="text-4xl mx-auto mb-4 text-teal-600" />
           <h2 className="font-semibold text-lg">Quick Appointments</h2>
-          <p className="text-gray-600 text-sm mt-2">
-            Book instantly, no queues.
-          </p>
+          <p className="text-gray-600 text-sm mt-2">Book instantly, no queues.</p>
         </motion.div>
 
         <motion.div
@@ -134,9 +177,7 @@ const Home = () => {
         >
           <FaUserMd className="text-4xl mx-auto mb-4 text-teal-600" />
           <h2 className="font-semibold text-lg">Expert Doctors</h2>
-          <p className="text-gray-600 text-sm mt-2">
-            Certified and experienced.
-          </p>
+          <p className="text-gray-600 text-sm mt-2">Certified and experienced.</p>
         </motion.div>
 
         <motion.div
@@ -145,15 +186,27 @@ const Home = () => {
         >
           <FaHospitalUser className="text-4xl mx-auto mb-4 text-teal-600" />
           <h2 className="font-semibold text-lg">24/7 Help</h2>
-          <p className="text-gray-600 text-sm mt-2">
-            Always available for you.
-          </p>
+          <p className="text-gray-600 text-sm mt-2">Always available for you.</p>
         </motion.div>
       </div>
 
-      {/* Toggle Appointments */}
+      {/* Previous Appointments Button */}
+      {token && (
+        <div className="text-center mb-12">
+          <motion.button
+            onClick={toggleAppointments}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="bg-teal-700 text-white px-6 py-3 rounded-full shadow-lg font-semibold hover:bg-teal-800 transition"
+          >
+            🕒 Previous Appointments
+          </motion.button>
+        </div>
+      )}
+
+      {/* Appointments Section */}
       <AnimatePresence>
-        {token && showAppointments && (
+        {showAppointments && (
           <motion.div
             className="max-w-4xl mx-auto bg-white p-6 rounded-xl shadow-lg border border-blue-100"
             initial={{ opacity: 0, y: 30 }}
@@ -164,20 +217,41 @@ const Home = () => {
             <h2 className="text-2xl font-bold text-teal-800 mb-4">
               Your Previous Appointments
             </h2>
-            <ul className="space-y-4">
-              <li className="p-4 border border-teal-100 rounded-md bg-blue-50 flex justify-between">
-                <span>🩺 Dr. Ravi Kumar - Cardiologist</span>
-                <span className="text-sm text-gray-600">
-                  15 April 2025, 10:00 AM
-                </span>
-              </li>
-              <li className="p-4 border border-teal-100 rounded-md bg-blue-50 flex justify-between">
-                <span>🧠 Dr. Anjali Sharma - Neurologist</span>
-                <span className="text-sm text-gray-600">
-                  28 March 2025, 3:30 PM
-                </span>
-              </li>
-            </ul>
+
+            {loading ? (
+              <p className="text-gray-500 text-center">Loading appointments...</p>
+            ) : appointments.length === 0 ? (
+              <p className="text-gray-500 italic text-center">No appointments to show.</p>
+            ) : (
+              <ul className="space-y-4">
+                {appointments.map((appt) => (
+                  <li
+                    key={appt._id}
+                    className="border border-gray-200 p-4 rounded-xl shadow-sm bg-gray-50"
+                  >
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <h3 className="text-lg font-semibold text-teal-700">
+                          {appt.doctorId?.name || "Doctor"}
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          {appt.doctorId?.specialization || "Specialist"} | {appt.date} @{" "}
+                          {appt.time}
+                        </p>
+                      </div>
+                      <span className="text-sm px-2 py-1 rounded-full bg-teal-100 text-teal-700 font-medium">
+                        {appt.status}
+                      </span>
+                    </div>
+                    {appt.symptoms && (
+                      <p className="text-gray-700 mt-2">
+                        <span className="font-medium">Symptoms:</span> {appt.symptoms}
+                      </p>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

@@ -9,6 +9,7 @@ function Signup() {
   const [hide, setHide] = useState(true);
   const [hided, setHided] = useState(true);
   const [err, setErr] = useState("");
+
   const [data, setData] = useState({
     name: "",
     email: "",
@@ -38,21 +39,14 @@ function Signup() {
     }
 
     try {
-      // console.log(password)
       const response = await axios.post(
         "http://localhost:9090/user/signup",
-        {
-          name,
-          email,
-          password,
-        },
-        {
-          withCredentials: true,
-        }
+        { name, email, password },
+        { withCredentials: true }
       );
 
       console.log("Successfully registered:", response.data);
-      navigate("/otpVerify", { state: { email } }); // Navigating to OTP page for verification
+      navigate("/otpVerify", { state: { email } });
     } catch (error) {
       console.log(error);
       setErr(error.response?.data?.message || "Signup failed");
@@ -61,11 +55,7 @@ function Signup() {
 
   const pageVariants = {
     initial: { opacity: 0, scale: 0.9 },
-    animate: {
-      opacity: 1,
-      scale: 1,
-      transition: { duration: 0.6, ease: "easeOut" },
-    },
+    animate: { opacity: 1, scale: 1, transition: { duration: 0.6, ease: "easeOut" } },
     exit: { opacity: 0, scale: 0.7, transition: { duration: 0.3 } },
   };
 
@@ -142,6 +132,9 @@ function Signup() {
 
         {/* Password */}
         <motion.div
+              id="password"
+              name="password"
+              type={hide ? "password" : "text"}
           custom={2}
           variants={inputVariants}
           initial="hidden"
@@ -215,6 +208,16 @@ function Signup() {
           className="w-full p-3 bg-teal-600 text-white font-semibold rounded-lg mb-4 hover:bg-teal-700 transition shadow-md"
         >
           Signup
+        </motion.button>
+
+        {/* Navigate to Doctor Signup */}
+        <motion.button
+          type="button"
+          onClick={() => navigate("/docter-signup")}
+          whileTap={{ scale: 0.95 }}
+          className="w-full p-2 rounded-lg mb-4 border text-center font-medium bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200"
+        >
+          I am a Doctor
         </motion.button>
 
         <motion.div

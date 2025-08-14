@@ -16,9 +16,21 @@ const {upload}=require("../middleware/multer");
 const {auth}= require('../middleware/auth')
 
 
+
 const userRouter = express.Router();
 const otpStore = new Map();
 require("dotenv").config();
+
+
+
+userRouter.get("/appointments/doctors", async (req, res) => {
+  try {
+    const doctors = await DoctorModel.find({}, "_id name");
+    res.status(200).json(doctors);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch doctors", error: error.message });
+  }
+});
 
 // GET: Signup page
 userRouter.get("/signup", (req, res) => {
@@ -160,7 +172,7 @@ userRouter.post(
       return next(new ErrorHandler("Invalid credentials", 400));
     }
 
-    const token = jwt.sign({ id: user._id }, process.env.SECRET, {
+    const token = jwt.sign({ id: user._id,name:user.name,email:user.email }, process.env.SECRET, {
       expiresIn: "30d",
     });
 
