@@ -165,7 +165,7 @@ const Home = () => {
           className="bg-white p-6 rounded-2xl shadow-xl text-center cursor-pointer"
           whileHover={{ scale: 1.05 }}
           onClick={() => navigate("/quick-appointment")}
-        >
+        > 
           <FaCalendarCheck className="text-4xl mx-auto mb-4 text-teal-600" />
           <h2 className="font-semibold text-lg">Quick Appointments</h2>
           <p className="text-gray-600 text-sm mt-2">Book instantly, no queues.</p>
@@ -245,7 +245,7 @@ const Home = () => {
                     </div>
                     {appt.symptoms && (
                       <p className="text-gray-700 mt-2">
-                        <span className="font-medium">Symptoms:</span> {appt.symptoms}
+                        <span className="font-medium">Symptom:</span> {appt.symptoms}
                       </p>
                     )}
                   </li>

@@ -27,7 +27,7 @@ function DoctorLoginPage() {
 
     try {
       const response = await axios.post(
-        "http://localhost:9090/docter/login", // doctor-specific login endpoint
+        "http://localhost:9090/doctor/login", // doctor-specific login endpoint (matches backend)
         { email, password },
         { withCredentials: true }
       );

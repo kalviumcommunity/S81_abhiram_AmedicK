@@ -11,7 +11,8 @@ app.get("/test",async(req,res)=>{
 })
 
 
-const port=process.env.PORT 
+// Default to 9090 if PORT is not set to match frontend expectations
+const port = process.env.PORT || 9090;
 
 app.listen(port,async()=>{
     try {

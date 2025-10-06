@@ -6,9 +6,10 @@ const jwt = require("jsonwebtoken");
 const DocterModel = require("../model/docterModel");
 const catchAsyncError = require("../middleware/catchAsyncError");
 const ErrorHandler = require("../utils/errorhadler");
+const e = require("express");
 
-// ENV Secret (for production, move this to process.env)
-const JWT_SECRET = "your_jwt_secret";
+// Use env secret for JWT. Falls back to a safe default for local dev.
+const JWT_SECRET = process.env.SECRET || process.env.JWT_SECRET || "your_jwt_secret";
 
 
 const doctorRouter = express.Router();
@@ -41,22 +42,27 @@ doctorRouter.post("/login", catchAsyncError(async (req, res, next) => {
     const isPasswordValid = await bcrypt.compare(password, doctor.password);
     if (!isPasswordValid) return next(new ErrorHandler("Invalid credentials", 400));
 
-    const token = jwt.sign(
-        { id: doctor._id, email: doctor.email },
-        JWT_SECRET,
-        { expiresIn: "1h" }
-    );
+  const token = jwt.sign({ id: doctor._id, email: doctor.email }, JWT_SECRET, { expiresIn: "1h" });
 
-    res.status(200).json({
-        message: "Login successful",
-        token,
-        doctor: {
-            id: doctor._id,
-            name: doctor.name,
-            email: doctor.email,
-            onDuty: doctor.onDuty
-        }
-    });
+  // Set token as httpOnly cookie so middleware that expects cookies works
+  // Cookie options: secure should be true in production when using HTTPS
+  res.cookie("accesstoken", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    maxAge: 60 * 60 * 1000, // 1 hour
+  });
+
+  res.status(200).json({
+    message: "Login successful",
+    token,
+    doctor: {
+      id: doctor._id,
+      name: doctor.name,
+      email: doctor.email,
+      onDuty: doctor.onDuty,
+    },
+  });
 }));
 
 

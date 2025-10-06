@@ -33,6 +33,14 @@ const QuickAppointment = () => {
 
   // Fetch doctors on load
   useEffect(() => {
+    // Auth guard: require logged-in user (token) or doctorToken
+    const token = localStorage.getItem("token") || localStorage.getItem("doctorToken");
+    if (!token) {
+      alert("Please login first.");
+      navigate("/login");
+      return;
+    }
+
     axios.get("http://localhost:9090/doctor/appointments/doctors")
       .then((res) => setDoctors(res.data))
       .catch((err) => console.error("Failed to load doctors", err));
