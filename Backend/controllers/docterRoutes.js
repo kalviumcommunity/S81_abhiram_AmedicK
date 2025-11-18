@@ -2,14 +2,27 @@ const express = require("express");
 // const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+require("dotenv").config();
 
 const DocterModel = require("../model/docterModel");
 const catchAsyncError = require("../middleware/catchAsyncError");
 const ErrorHandler = require("../utils/errorhadler");
 const e = require("express");
 
-// Use env secret for JWT. Falls back to a safe default for local dev.
-const JWT_SECRET = process.env.SECRET || process.env.JWT_SECRET || "your_jwt_secret";
+// Use env secret for JWT. Falls back to a dev default.
+const JWT_SECRET = process.env.SECRET || process.env.JWT_SECRET || "dev_secret";
+const JWT_EXPIRES = process.env.JWT_EXPIRES || "1h";
+const BCRYPT_ROUNDS = parseInt(process.env.BCRYPT_ROUNDS || "10", 10);
+
+const { auth } = require("../middleware/auth");
+
+function signDoctorToken(doctor) {
+  return jwt.sign(
+    { id: doctor._id, role: "doctor" },
+    JWT_SECRET,
+    { expiresIn: JWT_EXPIRES }
+  );
+}
 
 
 const doctorRouter = express.Router();
@@ -17,52 +30,86 @@ const doctorRouter = express.Router();
 // SIGNUP
 // ──────────────────────────────────────
 doctorRouter.post("/signup", catchAsyncError(async (req, res, next) => {
-    const { name, email, password } = req.body;
+  let { name, email, password } = req.body;
 
-    const existingUser = await DocterModel.findOne({ email });
-    if (existingUser) return next(new ErrorHandler("Doctor already exists", 400));
+  if (!name || !email || !password) {
+    return next(new ErrorHandler("All fields (name, email, password) are required", 400));
+  }
+  email = email.toLowerCase().trim();
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+  const existingUser = await DocterModel.findOne({ email });
+  if (existingUser) return next(new ErrorHandler("Doctor already exists", 409));
 
-    const newDoctor = new DocterModel({ name, email, password: hashedPassword });
-    await newDoctor.save();
+  if (password.length < 6) {
+    return next(new ErrorHandler("Password must be at least 6 characters", 400));
+  }
 
-    res.status(201).json({ message: "Doctor registered successfully" });
+  const hashedPassword = await bcrypt.hash(password, BCRYPT_ROUNDS);
+  const newDoctor = new DocterModel({ name: name.trim(), email, password: hashedPassword });
+  await newDoctor.save();
+
+  const token = signDoctorToken(newDoctor);
+  res.cookie("accesstoken", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    maxAge: 60 * 60 * 1000
+  });
+
+  res.status(201).json({
+    message: "Doctor registered successfully",
+    token,
+    doctor: newDoctor.toSafeObject()
+  });
 }));
 
 // ──────────────────────────────────────
 // LOGIN
 // ──────────────────────────────────────
 doctorRouter.post("/login", catchAsyncError(async (req, res, next) => {
-    const { email, password } = req.body;
+  let { email, password } = req.body;
+  if (!email || !password) return next(new ErrorHandler("Email and password required", 400));
+  email = email.toLowerCase().trim();
 
-    const doctor = await DocterModel.findOne({ email });
-    if (!doctor) return next(new ErrorHandler("Doctor not found", 400));
+  const doctor = await DocterModel.findOne({ email });
+  if (!doctor) return next(new ErrorHandler("Doctor not found", 404));
 
-    const isPasswordValid = await bcrypt.compare(password, doctor.password);
-    if (!isPasswordValid) return next(new ErrorHandler("Invalid credentials", 400));
+  const isPasswordValid = await bcrypt.compare(password, doctor.password);
+  if (!isPasswordValid) return next(new ErrorHandler("Invalid credentials", 401));
 
-  const token = jwt.sign({ id: doctor._id, email: doctor.email }, JWT_SECRET, { expiresIn: "1h" });
-
-  // Set token as httpOnly cookie so middleware that expects cookies works
-  // Cookie options: secure should be true in production when using HTTPS
+  const token = signDoctorToken(doctor);
   res.cookie("accesstoken", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-    maxAge: 60 * 60 * 1000, // 1 hour
+    maxAge: 60 * 60 * 1000
   });
 
   res.status(200).json({
     message: "Login successful",
     token,
-    doctor: {
-      id: doctor._id,
-      name: doctor.name,
-      email: doctor.email,
-      onDuty: doctor.onDuty,
-    },
+    doctor: doctor.toSafeObject()
   });
+}));
+
+// Logout route
+doctorRouter.post("/logout", (req, res) => {
+  res.clearCookie("accesstoken", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
+  });
+  res.status(200).json({ message: "Logged out" });
+});
+
+// Authenticated doctor profile
+doctorRouter.get("/me", auth, catchAsyncError(async (req, res, next) => {
+  if (req.user_role !== "doctor") {
+    return next(new ErrorHandler("Forbidden: doctor access only", 403));
+  }
+  const doctor = await DocterModel.findById(req.user_id);
+  if (!doctor) return next(new ErrorHandler("Doctor not found", 404));
+  res.json({ doctor: doctor.toSafeObject() });
 }));
 
 

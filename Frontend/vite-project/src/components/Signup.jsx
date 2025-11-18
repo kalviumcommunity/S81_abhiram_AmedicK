@@ -3,6 +3,7 @@ import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import MDButton from './ui/MDButton';
 
 function Signup() {
   const navigate = useNavigate();
@@ -82,9 +83,9 @@ function Signup() {
       initial="initial"
       animate="animate"
       exit="exit"
-      className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-50 to-teal-100"
+      className="md-app-wrapper flex items-center justify-center"
     >
-      <div className="w-full sm:w-[400px] bg-white p-8 rounded-2xl shadow-xl border border-blue-100">
+      <div className="w-full max-w-lg md-card fade-in">
         <motion.h1
           initial={{ y: -30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -99,7 +100,7 @@ function Signup() {
             variants={errorVariants}
             initial="hidden"
             animate="visible"
-            className="bg-red-100 border border-red-400 text-red-700 p-2 rounded-md mb-4 text-center"
+            className="md-chip md-chip-error mb-4"
           >
             {err}
           </motion.div>
@@ -112,10 +113,11 @@ function Signup() {
             variants={inputVariants}
             initial="hidden"
             animate="visible"
+            className="md-input-group"
           >
             <label
               htmlFor={field}
-              className="block text-gray-700 font-semibold mb-2 capitalize"
+              className="md-label capitalize"
             >
               {field}
             </label>
@@ -125,24 +127,22 @@ function Signup() {
               type={field === "email" ? "email" : "text"}
               value={data[field]}
               onChange={handleForm}
-              className="w-full p-3 border border-teal-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-teal-500 bg-blue-50"
+              className="md-input"
             />
           </motion.div>
         ))}
 
         {/* Password */}
         <motion.div
-              id="password"
-              name="password"
-              type={hide ? "password" : "text"}
           custom={2}
           variants={inputVariants}
           initial="hidden"
           animate="visible"
+          className="md-input-group"
         >
           <label
             htmlFor="password"
-            className="block text-gray-700 font-semibold mb-2"
+            className="md-label"
           >
             Password
           </label>
@@ -153,13 +153,14 @@ function Signup() {
               type={hide ? "password" : "text"}
               value={data.password}
               onChange={handleForm}
-              className="w-full p-3 border border-teal-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-teal-500 bg-blue-50"
+              className="md-input pr-10"
             />
             <motion.button
               type="button"
               onClick={handleHide}
               whileTap={{ scale: 1.2, rotate: 10 }}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-teal-600 hover:text-teal-800"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-teal-700"
+              style={{ background: 'transparent' }}
             >
               {hide ? <FaRegEye size={20} /> : <FaRegEyeSlash size={20} />}
             </motion.button>
@@ -172,10 +173,11 @@ function Signup() {
           variants={inputVariants}
           initial="hidden"
           animate="visible"
+          className="md-input-group"
         >
           <label
             htmlFor="confirmpass"
-            className="block text-gray-700 font-semibold mb-2"
+            className="md-label"
           >
             Confirm Password
           </label>
@@ -186,13 +188,14 @@ function Signup() {
               type={hided ? "password" : "text"}
               value={data.confirmpass}
               onChange={handleForm}
-              className="w-full p-3 border border-teal-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-teal-500 bg-blue-50"
+              className="md-input pr-10"
             />
             <motion.button
               type="button"
               onClick={handleHided}
               whileTap={{ scale: 1.2, rotate: -10 }}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-teal-600 hover:text-teal-800"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-teal-700"
+              style={{ background: 'transparent' }}
             >
               {hided ? <FaRegEye size={20} /> : <FaRegEyeSlash size={20} />}
             </motion.button>
@@ -200,25 +203,10 @@ function Signup() {
         </motion.div>
 
         {/* Signup button */}
-        <motion.button
-          type="button"
-          onClick={handleSubmit}
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.95 }}
-          className="w-full p-3 bg-teal-600 text-white font-semibold rounded-lg mb-4 hover:bg-teal-700 transition shadow-md"
-        >
-          Signup
-        </motion.button>
+        <MDButton onClick={handleSubmit} className="w-full mb-4">Signup</MDButton>
 
         {/* Navigate to Doctor Signup */}
-        <motion.button
-          type="button"
-          onClick={() => navigate("/docter-signup")}
-          whileTap={{ scale: 0.95 }}
-          className="w-full p-2 rounded-lg mb-4 border text-center font-medium bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200"
-        >
-          I am a Doctor
-        </motion.button>
+        <MDButton onClick={() => navigate("/doctor/register")} className="w-full mb-4" style={{ borderRadius: '28px' }}>I am a Doctor</MDButton>
 
         <motion.div
           initial={{ opacity: 0 }}

@@ -3,6 +3,7 @@ import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import MDButton from './ui/MDButton';
 import GoogleButton from "./GoogleButton";
 
 function Loginpage() {
@@ -34,8 +35,6 @@ function Loginpage() {
       if (response.data.token) {
         localStorage.setItem("token", response.data.token);
       }
-
-      console.log("Login successful:", response.data);
       navigate("/");
     } catch (err) {
       const message =
@@ -79,9 +78,10 @@ function Loginpage() {
       initial="initial"
       animate="animate"
       exit="exit"
-      className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-50 to-teal-100"
+      className="md-app-wrapper items-center justify-center flex"
     >
-      <div className="w-full sm:w-[400px] bg-white p-8 rounded-2xl shadow-xl border border-blue-100">
+      <div className="w-full max-w-md md-card fade-in">
+        {/* User login only; admin login moved to a separate route */}
         <motion.h1
           initial={{ y: -30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -96,7 +96,7 @@ function Loginpage() {
             variants={errorVariants}
             initial="hidden"
             animate="visible"
-            className="bg-red-100 border border-red-400 text-red-700 p-2 rounded-md mb-4 text-center"
+            className="md-chip status-rejected mb-4"
           >
             {error}
           </motion.div>
@@ -112,18 +112,21 @@ function Loginpage() {
         >
           Email Address
         </motion.label>
-        <motion.input
-          id="email"
-          type="email"
-          name="email"
-          value={data.email}
-          onChange={handleForm}
-          className="w-full p-3 border border-teal-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-teal-500 bg-blue-50"
-          variants={inputVariants}
-          initial="hidden"
-          animate="visible"
-          custom={0.1}
-        />
+        <div className="md-input-group">
+          <label htmlFor="email" className="md-label">Email</label>
+          <motion.input
+            id="email"
+            type="email"
+            name="email"
+            value={data.email}
+            onChange={handleForm}
+            className="md-input"
+            variants={inputVariants}
+            initial="hidden"
+            animate="visible"
+            custom={0.1}
+          />
+        </div>
 
         <motion.label
           htmlFor="password"
@@ -142,15 +145,28 @@ function Loginpage() {
           animate="visible"
           custom={0.3}
         >
-          <input
-            id="password"
-            name="password"
-            type={hide ? "password" : "text"}
-            value={data.password}
-            onChange={handleForm}
-            required
-            className="w-full p-3 border border-teal-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-teal-500 bg-blue-50"
-          />
+          <div className="md-input-group">
+            <label htmlFor="password" className="md-label">Password</label>
+            <input
+              id="password"
+              name="password"
+              type={hide ? "password" : "text"}
+              value={data.password}
+              onChange={handleForm}
+              required
+              className="md-input"
+            />
+            <motion.button
+              type="button"
+              onClick={handleHide}
+              whileTap={{ scale: 1.2, rotate: 15 }}
+              aria-label="Toggle password visibility"
+              className="absolute right-4 top-9 text-teal-700"
+              style={{ background: 'transparent' }}
+            >
+              {hide ? <FaRegEye size={18} /> : <FaRegEyeSlash size={18} />}
+            </motion.button>
+          </div>
           <motion.button
             type="button"
             onClick={handleHide}
@@ -162,15 +178,7 @@ function Loginpage() {
           </motion.button>
         </motion.div>
 
-        <motion.button
-          type="button"
-          onClick={handleSubmit}
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.95 }}
-          className="w-full p-3 bg-teal-600 text-white font-semibold rounded-lg mb-4 hover:bg-teal-700 transition shadow-md"
-        >
-          Login
-        </motion.button>
+        <MDButton onClick={handleSubmit} className="w-full mb-4">Login</MDButton>
 
         <motion.div
           initial={{ opacity: 0 }}
@@ -182,11 +190,16 @@ function Loginpage() {
             Don’t have an account?{" "}
             <span
               onClick={() => navigate("/signup")}
-              className="text-teal-600 cursor-pointer hover:underline font-semibold"
+              className="cursor-pointer font-semibold text-teal-700 hover:text-teal-800"
             >
               Sign up
             </span>
             <GoogleButton/>
+          </div>
+          <div className="center mt-lg">
+            <MDButton variant="outlined" onClick={() => navigate('/doctor/login')}>
+              I am a Doctor — Login
+            </MDButton>
           </div>
           
         </motion.div>
