@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:9090';
+export const API_BASE = import.meta.env.VITE_API_BASE || 'https://s81-abhiram-amedick.onrender.com';
 
 export const api = axios.create({
   baseURL: API_BASE,
