@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { api } from '../api';
 import MDButton from './ui/MDButton';
 import { getDoctorToken } from "../tokenStore";
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:9090';
+// Using shared api base
 const STATUSES = ['all','booked','accepted','cancelled','completed'];
 
 const DoctorAppointments = () => {
@@ -20,9 +20,8 @@ const DoctorAppointments = () => {
     setLoading(true);
     setMsg('');
     try {
-      const url = new URL(`${API_BASE}/api/doctor/appointments`);
-      if (filter !== 'all') url.searchParams.set('status', filter);
-      const res = await axios.get(url.toString(), { headers: { Authorization: `Bearer ${token}` } });
+      const params = filter !== 'all' ? { status: filter } : {};
+      const res = await api.get('/api/doctor/appointments', { params, headers: { Authorization: `Bearer ${token}` } });
       setList(res.data?.appointments || []);
     } catch (e) {
       setMsg(e.response?.data?.message || 'Failed to load appointments');
@@ -36,7 +35,7 @@ const DoctorAppointments = () => {
   const updateStatus = async (id, status) => {
     setMsg('');
     try {
-      await axios.patch(`${API_BASE}/api/doctor/appointment/${id}/status`, { status }, { headers: { Authorization: `Bearer ${token}` } });
+      await api.patch(`/api/doctor/appointment/${id}/status`, { status }, { headers: { Authorization: `Bearer ${token}` } });
       await load();
       setMsg('Updated');
     } catch (e) {

@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
-import axios from "axios";
+import { api } from "../api";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import MDButton from './ui/MDButton';
-import GoogleButton from "./GoogleButton";
 import { setDoctorToken } from "../tokenStore";
 
 function DoctorLoginPage() {
@@ -28,8 +27,8 @@ function DoctorLoginPage() {
     }
 
     try {
-      const response = await axios.post(
-        "http://localhost:9090/doctor/login",
+      const response = await api.post(
+        "/doctor/login",
         { email, password }
       );
 
@@ -192,9 +191,8 @@ function DoctorLoginPage() {
               onClick={() => navigate("/doctor/register")}
               className="text-teal-600 cursor-pointer hover:underline font-semibold"
             >
-              Sign up
+              Register
             </span>
-            <GoogleButton />
           </div>
         </motion.div>
       </div>

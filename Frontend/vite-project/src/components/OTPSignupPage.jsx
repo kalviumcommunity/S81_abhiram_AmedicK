@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import { api } from "../api";
 import { useNavigate } from "react-router-dom";
 
 function OTPSignupPage() {
@@ -27,7 +27,7 @@ function OTPSignupPage() {
     }
 
     try {
-      const res = await axios.post("http://localhost:9090/user/send-otp", {
+      const res = await api.post("/user/send-otp", {
         name,
         email,
         password,
@@ -50,7 +50,7 @@ function OTPSignupPage() {
     }
 
     try {
-      const res = await axios.post("http://localhost:9090/user/verify-otp", {
+      const res = await api.post("/user/verify-otp", {
         email,
         otp,
       });

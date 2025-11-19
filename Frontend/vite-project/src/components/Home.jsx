@@ -10,7 +10,7 @@ import {
   FaSignOutAlt,
   FaAddressCard,
 } from "react-icons/fa";
-import axios from "axios";
+import { api } from "../api";
 import MDButton from './ui/MDButton';
 
 const Home = () => {
@@ -53,8 +53,8 @@ const Home = () => {
 
     try {
       setLoading(true);
-      const response = await axios.get(
-        `http://localhost:9090/appointmentsbook/patient/${patientId}`,
+      const response = await api.get(
+        `/appointmentsbook/patient/${patientId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

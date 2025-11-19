@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FaUserCircle } from "react-icons/fa";
-import axios from "axios";
+import { api, API_BASE } from "../api";
 
 const Profile = () => {
   const [profile, setProfile] = useState({
@@ -18,8 +18,8 @@ const Profile = () => {
 
   // Fetch profile on mount
   useEffect(() => {
-    axios
-      .get("http://localhost:9090/user/upload", { withCredentials: true })
+    api
+      .get("/user/upload")
       .then((res) => {
         if (res.data.success && res.data.profile) {
           const data = res.data.profile;
@@ -32,9 +32,7 @@ const Profile = () => {
             address: data.address || "",
             photo: null,
           });
-          if (data.photoUrl) {
-            setPreviewUrl(`http://localhost:9090${data.photoUrl}`);
-          }
+          if (data.photoUrl) setPreviewUrl(`${API_BASE}${data.photoUrl}`);
         }
       })
       .catch((err) => {
@@ -62,14 +60,10 @@ const Profile = () => {
     });
 
     try {
-      const res = await axios.post(
-        "http://localhost:9090/user/upload",
+      const res = await api.post(
+        "/user/upload",
         formData,
-
-        {
-          withCredentials: true,
-          headers: { "Content-Type": "multipart/form-data" },
-        }
+        { headers: { "Content-Type": "multipart/form-data" } }
       );
       alert("Profile saved successfully!");
       setExistingProfile(res.data.profile);

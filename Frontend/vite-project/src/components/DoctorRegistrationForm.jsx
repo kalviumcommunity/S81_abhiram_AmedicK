@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import { api } from '../api';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
@@ -50,7 +50,7 @@ const DoctorRegistrationForm = () => {
 
     try {
       setLoading(true);
-      const res = await axios.post('http://localhost:9090/doctor/register', fd, { withCredentials: true });
+      const res = await api.post('/doctor/register', fd);
       setSuccess(res.data.message || 'Submitted');
       setTimeout(()=> navigate('/'), 1500);
     } catch (err) {

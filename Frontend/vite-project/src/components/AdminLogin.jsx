@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa6';
 import { motion } from 'framer-motion';
-import axios from 'axios';
+import { api } from '../api';
 import { useNavigate } from 'react-router-dom';
 import MDButton from './ui/MDButton';
 
@@ -18,7 +18,7 @@ const AdminLogin = () => {
     const { email, password } = data;
     if (!email || !password) { setError('Please fill in all fields.'); return; }
     try {
-      const res = await axios.post('http://localhost:9090/api/admin/login', { email, password }, { withCredentials: true });
+      const res = await api.post('/api/admin/login', { email, password });
       if (res.data.token) localStorage.setItem('adminToken', res.data.token);
       navigate('/admin/doctors/pending');
     } catch (err) {

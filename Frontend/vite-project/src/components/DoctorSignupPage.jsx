@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
-import axios from "axios";
+import { api } from "../api";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
@@ -30,10 +30,9 @@ function DoctorSignupPage() {
 
     try {
       setLoading(true);
-      const response = await axios.post(
-        "http://localhost:9090/doctor/signup",
-        { name, email, password },
-        { withCredentials: true }
+      const response = await api.post(
+        "/doctor/signup",
+        { name, email, password }
       );
 
       if (response.data.token) {

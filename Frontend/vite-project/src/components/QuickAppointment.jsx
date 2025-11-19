@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { FaCalendarPlus, FaArrowLeft } from "react-icons/fa";
-import axios from "axios";
+import { api } from "../api";
 
 const QuickAppointment = () => {
   const navigate = useNavigate();
@@ -41,7 +41,7 @@ const QuickAppointment = () => {
       return;
     }
 
-    axios.get("http://localhost:9090/doctor/appointments/doctors")
+    api.get("/doctor/appointments/doctors")
       .then((res) => setDoctors(res.data))
       .catch((err) => console.error("Failed to load doctors", err));
   }, []);
@@ -49,7 +49,7 @@ const QuickAppointment = () => {
   // Fetch slots on doctor/date change
   useEffect(() => {
     if (doctorId && date) {
-      axios.get(`http://localhost:9090/available/appointments/slots?doctorId=${doctorId}&date=${date}`)
+      api.get(`/available/appointments/slots?doctorId=${doctorId}&date=${date}`)
         .then((res) => setAvailableSlots(res.data))
         .catch((err) => console.error("Failed to load slots", err));
     } else {
@@ -78,8 +78,8 @@ const QuickAppointment = () => {
     }
 
     try {
-      const res = await axios.post(
-        "http://localhost:9090/appointmentsbook/Appointment",
+      const res = await api.post(
+        "/appointmentsbook/Appointment",
         {
           doctorId,
           patientId,

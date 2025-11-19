@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { api } from '../api';
 import MDButton from './ui/MDButton';
 import { getDoctorToken } from "../tokenStore";
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:9090';
+// Using shared api base
 
 const DoctorDashboard = () => {
   const navigate = useNavigate();
@@ -18,7 +18,7 @@ const DoctorDashboard = () => {
     const load = async () => {
       setMsg('');
       try {
-        const res = await axios.get(`${API_BASE}/api/doctor/dashboard`, { headers: { Authorization: `Bearer ${token}` } });
+        const res = await api.get(`/api/doctor/dashboard`, { headers: { Authorization: `Bearer ${token}` } });
         setData({ todayCount: res.data?.todayCount || 0, today: res.data?.today || [], upcoming: res.data?.upcoming || [] });
       } catch (e) {
         setMsg(e.response?.data?.message || 'Failed to load dashboard');

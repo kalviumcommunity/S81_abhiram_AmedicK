@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import { api, API_BASE } from '../api';
 import { motion } from 'framer-motion';
 
 const NMC_URL = 'https://www.nmc.org.in/information-desk/indian-medical-register/';
@@ -15,9 +15,8 @@ const AdminPendingDoctorsPage = () => {
   const fetchPending = async () => {
     setLoading(true); setError('');
     try {
-      const res = await axios.get('http://localhost:9090/api/admin/doctors/pending', {
+      const res = await api.get('/api/admin/doctors/pending', {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
-        withCredentials: true
       });
       setDoctors(res.data.doctors || []);
     } catch (err) {
@@ -31,7 +30,7 @@ const AdminPendingDoctorsPage = () => {
 
   const approve = async (id) => {
     try {
-      await axios.patch(`http://localhost:9090/api/admin/doctor/approve/${id}`, {}, { headers: token ? { Authorization: `Bearer ${token}` } : {}, withCredentials: true });
+      await api.patch(`/api/admin/doctor/approve/${id}`, {}, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
       setDoctors(d => d.filter(doc => doc._id !== id));
     } catch (err) { alert(err.response?.data?.message || 'Approve failed'); }
   };
@@ -39,7 +38,7 @@ const AdminPendingDoctorsPage = () => {
   const reject = async (id) => {
     const reason = reasonMap[id] || prompt('Reason (optional):') || '';
     try {
-      await axios.patch(`http://localhost:9090/api/admin/doctor/reject/${id}`, { reason }, { headers: token ? { Authorization: `Bearer ${token}` } : {}, withCredentials: true });
+      await api.patch(`/api/admin/doctor/reject/${id}`, { reason }, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
       setDoctors(d => d.filter(doc => doc._id !== id));
     } catch (err) { alert(err.response?.data?.message || 'Reject failed'); }
   };
@@ -79,10 +78,10 @@ const AdminPendingDoctorsPage = () => {
                     <td className='p-2'>{doc.specialization}</td>
                     <td className='p-2'>
                       <div className='flex flex-col gap-1'>
-                        {doc.documents?.medicalRegistrationCertificate && <a className='text-teal-600 underline' href={`http://localhost:9090/profile-photo/${doc.documents.medicalRegistrationCertificate}`} target='_blank'>Registration Cert</a>}
-                        {doc.documents?.degreeCertificate && <a className='text-teal-600 underline' href={`http://localhost:9090/profile-photo/${doc.documents.degreeCertificate}`} target='_blank'>Degree Cert</a>}
-                        {doc.documents?.govtIdProof && <a className='text-teal-600 underline' href={`http://localhost:9090/profile-photo/${doc.documents.govtIdProof}`} target='_blank'>Govt ID</a>}
-                        {doc.profilePhoto && <a className='text-teal-600 underline' href={`http://localhost:9090/profile-photo/${doc.profilePhoto}`} target='_blank'>Profile Photo</a>}
+                        {doc.documents?.medicalRegistrationCertificate && <a className='text-teal-600 underline' href={`${API_BASE}/profile-photo/${doc.documents.medicalRegistrationCertificate}`} target='_blank'>Registration Cert</a>}
+                        {doc.documents?.degreeCertificate && <a className='text-teal-600 underline' href={`${API_BASE}/profile-photo/${doc.documents.degreeCertificate}`} target='_blank'>Degree Cert</a>}
+                        {doc.documents?.govtIdProof && <a className='text-teal-600 underline' href={`${API_BASE}/profile-photo/${doc.documents.govtIdProof}`} target='_blank'>Govt ID</a>}
+                        {doc.profilePhoto && <a className='text-teal-600 underline' href={`${API_BASE}/profile-photo/${doc.profilePhoto}`} target='_blank'>Profile Photo</a>}
                       </div>
                     </td>
                     <td className='p-2'>

@@ -17,7 +17,6 @@ app.use(cookieParser());
 require('./config/passport');
 
 app.use(cors({
-  origin: "http://localhost:5173",
   credentials: true
 }));
 

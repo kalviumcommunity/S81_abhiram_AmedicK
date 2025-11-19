@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import axios from 'axios';
+import { api } from '../api';
 import { useNavigate } from 'react-router-dom';
 import MDButton from './ui/MDButton';
 
@@ -16,7 +16,7 @@ const AdminSignup = () => {
     const { name, email, password } = form;
     if (!name || !email || !password) { setError('All fields are required'); return; }
     try {
-      const res = await axios.post('http://localhost:9090/api/admin/signup', { name, email, password });
+      const res = await api.post('/api/admin/signup', { name, email, password });
       setSuccess(res.data?.message || 'Admin created');
       setTimeout(() => navigate('/login'), 800);
     } catch (err) {

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
-import axios from "axios";
+import { api } from "../api";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import MDButton from './ui/MDButton';
@@ -40,10 +40,9 @@ function Signup() {
     }
 
     try {
-      const response = await axios.post(
-        "http://localhost:9090/user/signup",
-        { name, email, password },
-        { withCredentials: true }
+      const response = await api.post(
+        "/user/signup",
+        { name, email, password }
       );
 
       console.log("Successfully registered:", response.data);

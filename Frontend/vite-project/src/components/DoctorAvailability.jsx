@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { api, API_BASE } from '../api';
 import MDButton from './ui/MDButton';
 import { getDoctorToken } from "../tokenStore";
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:9090';
+// API_BASE provided by shared api module
 const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 const dayNameToNum = { Sunday: 0, Monday: 1, Tuesday: 2, Wednesday: 3, Thursday: 4, Friday: 5, Saturday: 6 };
 const dayNumToName = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
@@ -23,7 +23,7 @@ const DoctorAvailability = () => {
     if (!token) return navigate('/doctor/login');
     const load = async () => {
       try {
-        const res = await axios.get(`${API_BASE}/api/doctor/availability`, { headers: { Authorization: `Bearer ${token}` } });
+        const res = await api.get(`/api/doctor/availability`, { headers: { Authorization: `Bearer ${token}` } });
         setAvailability(res.data?.availability || []);
       } catch (e) {
         setMsg(e.response?.data?.message || 'Failed to load availability');
@@ -74,8 +74,8 @@ const DoctorAvailability = () => {
     if (!slots.length) { setMsg('Please enter at least one valid time, e.g. 09:00, 09:30 or 09:00-11:00'); return; }
     try {
       const dayNum = dayNameToNum[selectedDay] ?? 1;
-      await axios.post(`${API_BASE}/api/doctor/availability`, { day: dayNum, slots }, { headers: { Authorization: `Bearer ${token}` } });
-      const res = await axios.get(`${API_BASE}/api/doctor/availability`, { headers: { Authorization: `Bearer ${token}` } });
+      await api.post(`/api/doctor/availability`, { day: dayNum, slots }, { headers: { Authorization: `Bearer ${token}` } });
+      const res = await api.get(`/api/doctor/availability`, { headers: { Authorization: `Bearer ${token}` } });
       setAvailability(res.data?.availability || []);
       setSlotsInput('');
       setMsg('Availability saved');
@@ -87,7 +87,7 @@ const DoctorAvailability = () => {
   const deleteDay = async (day) => {
     setMsg('');
     try {
-      await axios.delete(`${API_BASE}/api/doctor/availability/${encodeURIComponent(day)}`, { headers: { Authorization: `Bearer ${token}` } });
+      await api.delete(`/api/doctor/availability/${encodeURIComponent(day)}`, { headers: { Authorization: `Bearer ${token}` } });
       setAvailability(prev => prev.filter(a => a.day !== day));
       setMsg('Deleted');
     } catch (e) {
@@ -98,7 +98,7 @@ const DoctorAvailability = () => {
   const deleteSlot = async (day, slot) => {
     setMsg('');
     try {
-      await axios.delete(`${API_BASE}/api/doctor/availability/${encodeURIComponent(day)}?slot=${encodeURIComponent(slot)}`, { headers: { Authorization: `Bearer ${token}` } });
+      await api.delete(`/api/doctor/availability/${encodeURIComponent(day)}?slot=${encodeURIComponent(slot)}`, { headers: { Authorization: `Bearer ${token}` } });
       setAvailability(prev => prev.map(a => a.day === day ? { ...a, slots: (a.slots || []).filter(s => s !== slot) } : a));
     } catch (e) {
       setMsg(e.response?.data?.message || 'Failed to delete slot');
@@ -120,10 +120,10 @@ const DoctorAvailability = () => {
     try {
       for (let a = toMin(range.start); a < toMin(range.end); a += 30) {
         const slot = toHHMM(a);
-        await axios.delete(`${API_BASE}/api/doctor/availability/${encodeURIComponent(day)}?slot=${encodeURIComponent(slot)}`, { headers: { Authorization: `Bearer ${token}` } });
+        await api.delete(`/api/doctor/availability/${encodeURIComponent(day)}?slot=${encodeURIComponent(slot)}`, { headers: { Authorization: `Bearer ${token}` } });
       }
       // reload day availability from server to ensure consistency
-      const res = await axios.get(`${API_BASE}/api/doctor/availability`, { headers: { Authorization: `Bearer ${token}` } });
+      const res = await api.get(`/api/doctor/availability`, { headers: { Authorization: `Bearer ${token}` } });
       setAvailability(res.data?.availability || []);
     } catch (e) {
       setMsg(e.response?.data?.message || 'Failed to delete range');
@@ -134,7 +134,7 @@ const DoctorAvailability = () => {
   const loadDateSlots = async (date) => {
     if (!date) { setDateSlots([]); return; }
     try {
-      const res = await axios.get(`${API_BASE}/api/doctor/available-slots?date=${encodeURIComponent(date)}`, { headers: { Authorization: `Bearer ${token}` } });
+      const res = await api.get(`/api/doctor/available-slots?date=${encodeURIComponent(date)}`, { headers: { Authorization: `Bearer ${token}` } });
       setDateSlots(res.data?.slots || []);
     } catch (e) {
       setDateSlots([]);

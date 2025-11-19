@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
-import axios from "axios";
+import { api } from "../api";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import MDButton from './ui/MDButton';
@@ -27,10 +27,9 @@ function Loginpage() {
     }
 
     try {
-      const response = await axios.post(
-        "http://localhost:9090/user/login",
-        { email, password },
-        { withCredentials: true }
+      const response = await api.post(
+        "/user/login",
+        { email, password }
       );
       if (response.data.token) {
         localStorage.setItem("token", response.data.token);

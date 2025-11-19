@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import { api } from "../api";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 
@@ -39,10 +39,9 @@ const OtpVerifyPage = () => {
     setMessage("");
 
     try {
-      const response = await axios.post(
-        "http://localhost:9090/user/verify-otp",
-        { email, otp: otpValue },
-        { withCredentials: true }
+      const response = await api.post(
+        "/user/verify-otp",
+        { email, otp: otpValue }
       );
       setMessage(response.data.message);
       navigate("/login");

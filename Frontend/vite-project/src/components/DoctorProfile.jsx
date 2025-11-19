@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { api, API_BASE } from '../api';
 import MDButton from './ui/MDButton';
 import { getDoctorToken } from "../tokenStore";
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:9090';
+// API_BASE provided by shared api module
 
 const DoctorProfile = () => {
   const navigate = useNavigate();
@@ -37,7 +37,7 @@ const DoctorProfile = () => {
     }
     const fetchProfile = async () => {
       try {
-        const res = await axios.get(`${API_BASE}/api/doctor/profile`, {
+        const res = await api.get(`/api/doctor/profile`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         const d = res.data?.doctor || {};
@@ -79,7 +79,7 @@ const DoctorProfile = () => {
       fd.append('clinic', JSON.stringify(form.clinic));
       if (file) fd.append('profilePhoto', file);
 
-      const res = await axios.patch(`${API_BASE}/api/doctor/profile`, fd, {
+      const res = await api.patch(`/api/doctor/profile`, fd, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const updated = res.data?.doctor || {};
