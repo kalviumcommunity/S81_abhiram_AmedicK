@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import MDButton from './ui/MDButton';
 import GoogleButton from "./GoogleButton";
+import { setDoctorToken } from "../tokenStore";
 
 function DoctorLoginPage() {
   const navigate = useNavigate();
@@ -28,14 +29,11 @@ function DoctorLoginPage() {
 
     try {
       const response = await axios.post(
-        "http://localhost:9090/doctor/login", // doctor-specific login endpoint (matches backend)
-        { email, password },
-        { withCredentials: true }
+        "http://localhost:9090/doctor/login",
+        { email, password }
       );
 
-      if (response.data.token) {
-        localStorage.setItem("doctorToken", response.data.token);
-      }
+      if (response.data.token) setDoctorToken(response.data.token);
 
       console.log("Doctor login successful:", response.data);
       navigate("/doctor/home");

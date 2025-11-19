@@ -2,17 +2,18 @@ import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiUser, FiCalendar, FiClock, FiBarChart2 } from "react-icons/fi";
 import MDButton from "./ui/MDButton";
+import { getDoctorToken, clearDoctorToken } from "../tokenStore";
 
 const DoctorHome = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem("doctorToken");
+    const token = getDoctorToken();
     if (!token) navigate("/doctor/login");
   }, [navigate]);
 
   const logout = () => {
-    localStorage.removeItem("doctorToken");
+    clearDoctorToken();
     navigate("/doctor/login");
   };
 

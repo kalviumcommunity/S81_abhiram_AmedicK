@@ -2,13 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import MDButton from './ui/MDButton';
+import { getDoctorToken } from "../tokenStore";
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:9090';
 const STATUSES = ['all','booked','accepted','cancelled','completed'];
 
 const DoctorAppointments = () => {
   const navigate = useNavigate();
-  const token = localStorage.getItem('doctorToken');
+  const token = getDoctorToken();
   const [filter, setFilter] = useState('all');
   const [list, setList] = useState([]);
   const [msg, setMsg] = useState('');

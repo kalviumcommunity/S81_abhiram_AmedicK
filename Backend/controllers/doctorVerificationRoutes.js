@@ -132,12 +132,7 @@ router.post('/login', catchAsyncError(async (req, res, next) => {
   const valid = await bcrypt.compare(password, doctor.password);
   if (!valid) return next(new ErrorHandler('Invalid credentials', 401));
   const token = signDoctorToken(doctor);
-  res.cookie('accesstoken', token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-    maxAge: 60 * 60 * 1000
-  });
+  // Do not set cookies; return token only for Authorization header usage
   res.json({ message: 'Login successful', token, doctor: doctor.toSafeObject() });
 }));
 

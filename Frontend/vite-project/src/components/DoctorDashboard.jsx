@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import MDButton from './ui/MDButton';
+import { getDoctorToken } from "../tokenStore";
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:9090';
 
 const DoctorDashboard = () => {
   const navigate = useNavigate();
-  const token = localStorage.getItem('doctorToken');
+  const token = getDoctorToken();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState({ todayCount: 0, today: [], upcoming: [] });
   const [msg, setMsg] = useState('');

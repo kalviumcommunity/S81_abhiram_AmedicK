@@ -2,11 +2,10 @@
     require("dotenv").config();
 
 const auth = (req, res, next) => {
-    // Prefer cookie token; fallback to Authorization: Bearer <token>
-    const bearer = req.headers.authorization && req.headers.authorization.startsWith("Bearer ")
+    // Only allow Authorization: Bearer <token>; do not read cookies
+    const token = req.headers.authorization && req.headers.authorization.startsWith("Bearer ")
         ? req.headers.authorization.split(" ")[1]
         : null;
-    const token = req.cookies.accesstoken || bearer;
 
     if (!token) {
         return res.status(401).json({ message: "Authentication required" });

@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import MDButton from './ui/MDButton';
+import { getDoctorToken } from "../tokenStore";
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:9090';
 const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
@@ -10,7 +11,7 @@ const dayNumToName = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday
 
 const DoctorAvailability = () => {
   const navigate = useNavigate();
-  const token = localStorage.getItem('doctorToken');
+  const token = getDoctorToken();
   const [availability, setAvailability] = useState([]);
   const [selectedDay, setSelectedDay] = useState(DAYS[0]);
   const [slotsInput, setSlotsInput] = useState('');
