@@ -7,6 +7,7 @@ const adminAuthRoutes = require('./routes/adminAuthRoutes');
 const doctorFeatureRoutes = require('./controllers/doctorFeatureRoutes');
 const AppointmentRouter = require("./controllers/bookAppointment");
 const getAvailableSlotsRouter = require("./controllers/getAvailableSlots"); // ✅
+const aiAutocompleteRouter = require('./controllers/aiAutocomplete');
 const cookieParser = require('cookie-parser');
 const cors = require("cors");
 const path = require('path');
@@ -22,6 +23,7 @@ app.use(cors({
 
 app.use("/appointmentsbook", AppointmentRouter);
 app.use("/available", getAvailableSlotsRouter); // ✅ This line fixed your issue
+app.use('/api/ai', aiAutocompleteRouter);
 
 app.use("/user", userRouter);
 app.use('/doctor', doctorRouter); // legacy doctor routes

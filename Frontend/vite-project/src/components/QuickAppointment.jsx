@@ -14,6 +14,7 @@ const QuickAppointment = () => {
   const [availableSlots, setAvailableSlots] = useState([]);
   const [timeSlot, setTimeSlot] = useState("");
   const [symptoms, setSymptoms] = useState("");
+  const [suggestion, setSuggestion] = useState("");
   const [message, setMessage] = useState("");
 
   // Decode JWT from localStorage
@@ -57,6 +58,29 @@ const QuickAppointment = () => {
       setTimeSlot("");
     }
   }, [doctorId, date]);
+
+  // LLM autocomplete for symptoms input
+  useEffect(() => {
+    if (!symptoms || symptoms.trim().length < 3) {
+      setSuggestion("");
+      return;
+    }
+    const timeout = setTimeout(async () => {
+      try {
+        const res = await api.post('/api/ai/autocomplete', { text: symptoms });
+        setSuggestion(res.data?.suggestion || "");
+      } catch (err) {
+        setSuggestion("");
+      }
+    }, 400);
+    return () => clearTimeout(timeout);
+  }, [symptoms]);
+
+  const acceptSuggestion = () => {
+    if (!suggestion) return;
+    setSymptoms(suggestion);
+    setSuggestion("");
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -221,10 +245,22 @@ const QuickAppointment = () => {
           <textarea
             value={symptoms}
             onChange={(e) => setSymptoms(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Tab" && suggestion) {
+                e.preventDefault();
+                acceptSuggestion();
+              }
+            }}
             rows={4}
             className="w-full border border-gray-300 rounded-lg p-3 resize-none"
             placeholder="Describe your symptoms"
           ></textarea>
+          {suggestion && (
+            <div className="text-sm text-gray-600 mt-2 flex items-center gap-3">
+              <span>Suggested: {suggestion}</span>
+              <button type="button" className="text-teal-700 underline" onClick={acceptSuggestion}>Use</button>
+            </div>
+          )}
         </div>
 
         <motion.button
