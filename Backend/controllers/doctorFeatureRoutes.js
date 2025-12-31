@@ -121,4 +121,12 @@ router.patch('/appointment/:id/status', doctorAuth, async (req, res) => {
   res.json({ message: 'Status updated', appointment: appt });
 });
 
+// Delete appointment (hard delete)
+router.delete('/appointment/:id', doctorAuth, async (req, res) => {
+  const { id } = req.params;
+  const deleted = await Appointment.findOneAndDelete({ _id: id, doctorId: req.doctor.id });
+  if (!deleted) return res.status(404).json({ message: 'Appointment not found' });
+  res.json({ message: 'Appointment deleted', appointment: deleted });
+});
+
 module.exports = router;

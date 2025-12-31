@@ -43,6 +43,19 @@ const DoctorAppointments = () => {
     }
   };
 
+  const deleteAppointment = async (id) => {
+    setMsg('');
+    const ok = window.confirm('Delete this appointment permanently?');
+    if (!ok) return;
+    try {
+      await api.delete(`/api/doctor/appointment/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+      await load();
+      setMsg('Deleted');
+    } catch (e) {
+      setMsg(e.response?.data?.message || 'Failed to delete');
+    }
+  };
+
   const actionButtons = (a) => {
     const buttons = [];
     if (a.status === 'booked') {
@@ -52,6 +65,10 @@ const DoctorAppointments = () => {
     if (a.status === 'accepted') {
       buttons.push(<MDButton key="complete" onClick={() => updateStatus(a._id, 'completed')}>Complete</MDButton>);
       buttons.push(<MDButton key="cancel" variant="outlined" onClick={() => updateStatus(a._id, 'cancelled')}>Cancel</MDButton>);
+    }
+
+    if (a.status === 'cancelled' || a.status === 'completed') {
+      buttons.push(<MDButton key="delete" variant="outlined" onClick={() => deleteAppointment(a._id)}>Delete</MDButton>);
     }
     return <div className="md-actions">{buttons}</div>;
   };
